@@ -57,13 +57,39 @@ bool ClustrixMonitor::configure(const MXS_CONFIG_PARAMETER* pParams)
 
 bool ClustrixMonitor::softfail(SERVER* pServer, json_t** ppError)
 {
-    MXS_NOTICE("Should softfail %s.", pServer->address);
+    bool rv = false;
+
+    if (is_running())
+    {
+        call([this, pServer, ppError, &rv]() {
+                rv = perform_softfail(pServer, ppError);
+            },
+            EXECUTE_QUEUED);
+    }
+    else
+    {
+        rv = perform_softfail(pServer, ppError);
+    }
+
     return true;
 }
 
 bool ClustrixMonitor::unsoftfail(SERVER* pServer, json_t** ppError)
 {
-    MXS_NOTICE("Should unsoftfail %s.", pServer->address);
+    bool rv = false;
+
+    if (is_running())
+    {
+        call([this, pServer, ppError, &rv]() {
+                rv = perform_softfail(pServer, ppError);
+            },
+            EXECUTE_QUEUED);
+    }
+    else
+    {
+        rv = perform_softfail(pServer, ppError);
+    }
+
     return true;
 }
 
@@ -565,4 +591,16 @@ bool ClustrixMonitor::check_http(Call::action_t action)
     }
 
     return false;
+}
+
+bool ClustrixMonitor::perform_softfail(SERVER* pServer, json_t** ppError)
+{
+    MXS_NOTICE("Should perform softfail for: %s", pServer->address);
+    return true;
+}
+
+bool ClustrixMonitor::perform_unsoftfail(SERVER* pServer, json_t** ppError)
+{
+    MXS_NOTICE("Should perform unsoftfail for: %s", pServer->address);
+    return true;
 }
